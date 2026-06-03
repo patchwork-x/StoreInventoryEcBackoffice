@@ -1,0 +1,250 @@
+﻿@model StoreInventoryEcBackoffice.Web.ViewModels.SupportTicketListViewModel
+
+@{
+    ViewData["Title"] = "問い合わせ・改修依頼管理";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 fw-bold">問い合わせ・改修依頼管理</h1>
+            <p class="text-muted mb-0">
+                社内問い合わせ、障害調査、改修依頼を注文・商品情報と紐づけて管理します。
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">未完了チケット</div>
+                    <div class="fs-3 fw-bold">@Model.OpenTicketCount</div>
+                    <div class="small text-muted">open tickets</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">高優先度</div>
+                    <div class="fs-3 fw-bold">@Model.HighPriorityCount</div>
+                    <div class="small text-muted">high priority</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">改修依頼</div>
+                    <div class="fs-3 fw-bold">@Model.ChangeRequestCount</div>
+                    <div class="small text-muted">change requests</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">検索条件</h2>
+        </div>
+
+        <div class="card-body">
+            <form method="get" asp-controller="SupportTickets" asp-action="Index" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">キーワード</label>
+                    <input type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control"
+                           placeholder="件名・内容" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">依頼部署</label>
+                    <select name="department" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.Departments)
+                        {
+                            if (Model.Department == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">種別</label>
+                    <select name="ticketType" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.TicketTypes)
+                        {
+                            if (Model.TicketType == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">優先度</label>
+                    <select name="priority" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.Priorities)
+                        {
+                            if (Model.Priority == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">ステータス</label>
+                    <select name="status" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.Statuses)
+                        {
+                            if (Model.Status == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">
+                        検索
+                    </button>
+                </div>
+
+                <div class="col-md-12">
+                    <a asp-controller="SupportTickets" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        条件クリア
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">問い合わせ・改修依頼一覧</h2>
+            <span class="text-muted small">@Model.Tickets.Count 件</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>件名</th>
+                        <th>部署</th>
+                        <th>種別</th>
+                        <th>優先度</th>
+                        <th>ステータス</th>
+                        <th>担当</th>
+                        <th>関連情報</th>
+                        <th>作成日時</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticket in Model.Tickets)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@ticket.Title</td>
+                            <td>@ticket.Department</td>
+                            <td>
+                                @if (ticket.TicketType == "改修依頼")
+                                {
+                                    <span class="badge bg-info text-dark">@ticket.TicketType</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">@ticket.TicketType</span>
+                                }
+                            </td>
+                            <td>
+                                @if (ticket.Priority == "高")
+                                {
+                                    <span class="badge bg-danger">@ticket.Priority</span>
+                                }
+                                else if (ticket.Priority == "中")
+                                {
+                                    <span class="badge bg-warning text-dark">@ticket.Priority</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@ticket.Priority</span>
+                                }
+                            </td>
+                            <td>
+                                @if (ticket.Status == "完了")
+                                {
+                                    <span class="badge bg-success">@ticket.Status</span>
+                                }
+                                else if (ticket.Status == "保留")
+                                {
+                                    <span class="badge bg-secondary">@ticket.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">@ticket.Status</span>
+                                }
+                            </td>
+                            <td>@ticket.AssignedUserName</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(ticket.RelatedOrderNumber))
+                                {
+                                    <div class="small">注文: @ticket.RelatedOrderNumber</div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(ticket.RelatedProductCode))
+                                {
+                                    <div class="small">
+                                        商品: @ticket.RelatedProductCode / @ticket.RelatedProductName
+                                    </div>
+                                }
+
+                                @if (string.IsNullOrWhiteSpace(ticket.RelatedOrderNumber)
+                                    && string.IsNullOrWhiteSpace(ticket.RelatedProductCode))
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
+                            <td>@ticket.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Tickets.Any())
+        {
+            <div class="card-body text-center text-muted">
+                条件に一致する問い合わせ・改修依頼がありません。
+            </div>
+        }
+    </div>
+</div>

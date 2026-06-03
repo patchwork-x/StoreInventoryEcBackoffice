@@ -1,0 +1,134 @@
+﻿@model StoreInventoryEcBackoffice.Web.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "ダッシュボード";
+}
+
+<div class="container-fluid">
+    <div class="mb-4">
+        <h1 class="h3 fw-bold">店舗在庫連携型ECバックオフィス</h1>
+        <p class="text-muted mb-0">
+            EC注文、店舗在庫、社内問い合わせを一元管理する業務システムです。
+        </p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4 col-xl-2">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">本日の注文件数</div>
+                    <div class="fs-3 fw-bold">@Model.TodayOrderCount</div>
+                    <div class="small text-muted">orders today</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-xl-2">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">出荷待ち件数</div>
+                    <div class="fs-3 fw-bold">@Model.ShippingWaitingCount</div>
+                    <div class="small text-muted">waiting shipment</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-xl-2">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">未完了問い合わせ</div>
+                    <div class="fs-3 fw-bold">@Model.OpenTicketCount</div>
+                    <div class="small text-muted">open tickets</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-xl-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">EC掲載中商品</div>
+                    <div class="fs-3 fw-bold">@Model.EcPublishedProductCount</div>
+                    <div class="small text-muted">published products</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-xl-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">総在庫数</div>
+                    <div class="fs-3 fw-bold">@Model.TotalInventoryQuantity</div>
+                    <div class="small text-muted">total stock quantity</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">最新注文</h2>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>注文番号</th>
+                                <th>顧客名</th>
+                                <th>ステータス</th>
+                                <th class="text-end">金額</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td>@order.OrderNumber</td>
+                                    <td>@order.CustomerName</td>
+                                    <td>
+                                        <span class="badge bg-secondary">@order.OrderStatus</span>
+                                    </td>
+                                    <td class="text-end">@order.TotalAmount.ToString("N0") 円</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">最新問い合わせ・改修依頼</h2>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>件名</th>
+                                <th>優先度</th>
+                                <th>ステータス</th>
+                                <th>担当</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ticket in Model.RecentTickets)
+                            {
+                                <tr>
+                                    <td>@ticket.Title</td>
+                                    <td>@ticket.Priority</td>
+                                    <td>
+                                        <span class="badge bg-dark">@ticket.Status</span>
+                                    </td>
+                                    <td>@(ticket.AssignedUser?.UserName ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>

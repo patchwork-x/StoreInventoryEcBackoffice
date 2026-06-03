@@ -1,0 +1,145 @@
+﻿@model StoreInventoryEcBackoffice.Web.ViewModels.ProductListViewModel
+
+@{
+    ViewData["Title"] = "商品管理";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 fw-bold">商品管理</h1>
+            <p class="text-muted mb-0">
+                商品マスタ、EC掲載ステータス、店舗在庫数を確認できます。
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">検索条件</h2>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-controller="Products" asp-action="Index" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">キーワード</label>
+                    <input type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control"
+                           placeholder="商品名・商品コード・JANコード" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">カテゴリ</label>
+                    <select name="categoryId" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            if (Model.CategoryId == category.Id)
+                            {
+                                <option value="@category.Id" selected>@category.CategoryName</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Id">@category.CategoryName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">EC掲載ステータス</label>
+                    <select name="ecStatus" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var status in Model.EcStatuses)
+                        {
+                            if (Model.EcStatus == status)
+                            {
+                                <option value="@status" selected>@status</option>
+                            }
+                            else
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-dark w-100">
+                        検索
+                    </button>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary">
+                        クリア
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">商品一覧</h2>
+            <span class="text-muted small">@Model.Products.Count 件</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>商品コード</th>
+                        <th>商品名</th>
+                        <th>カテゴリ</th>
+                        <th>状態</th>
+                        <th class="text-end">買取価格</th>
+                        <th class="text-end">販売価格</th>
+                        <th>EC掲載</th>
+                        <th class="text-end">総在庫数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@product.ProductCode</div>
+                                <div class="small text-muted">@product.JanCode</div>
+                            </td>
+                            <td>@product.ProductName</td>
+                            <td>@product.CategoryName</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    @product.ConditionRank
+                                </span>
+                            </td>
+                            <td class="text-end">@product.PurchasePrice.ToString("N0") 円</td>
+                            <td class="text-end fw-semibold">@product.SellingPrice.ToString("N0") 円</td>
+                            <td>
+                                @if (product.EcStatus == "掲載中")
+                                {
+                                    <span class="badge bg-success">@product.EcStatus</span>
+                                }
+                                else if (product.EcStatus == "未掲載")
+                                {
+                                    <span class="badge bg-secondary">@product.EcStatus</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">@product.EcStatus</span>
+                                }
+                            </td>
+                            <td class="text-end">@product.TotalStockQuantity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="card-body text-center text-muted">
+                条件に一致する商品がありません。
+            </div>
+        }
+    </div>
+</div>

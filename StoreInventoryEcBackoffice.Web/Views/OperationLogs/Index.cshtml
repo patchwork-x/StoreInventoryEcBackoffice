@@ -1,0 +1,190 @@
+﻿@model StoreInventoryEcBackoffice.Web.ViewModels.OperationLogListViewModel
+
+@{
+    ViewData["Title"] = "操作ログ";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 fw-bold">操作ログ</h1>
+            <p class="text-muted mb-0">
+                商品、注文、問い合わせなどに対する操作履歴を確認できます。
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">登録操作</div>
+                    <div class="fs-3 fw-bold">@Model.CreateCount</div>
+                    <div class="small text-muted">create actions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">更新操作</div>
+                    <div class="fs-3 fw-bold">@Model.UpdateCount</div>
+                    <div class="small text-muted">update actions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">削除操作</div>
+                    <div class="fs-3 fw-bold">@Model.DeleteCount</div>
+                    <div class="small text-muted">delete actions</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">検索条件</h2>
+        </div>
+
+        <div class="card-body">
+            <form method="get" asp-controller="OperationLogs" asp-action="Index" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">キーワード</label>
+                    <input type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control"
+                           placeholder="操作内容・対象・ユーザー" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">操作種別</label>
+                    <select name="actionType" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.ActionTypes)
+                        {
+                            if (Model.ActionType == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">対象テーブル</label>
+                    <select name="targetTable" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var item in Model.TargetTables)
+                        {
+                            if (Model.TargetTable == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">操作日 From</label>
+                    <input type="date"
+                           name="fromDate"
+                           value="@(Model.FromDate?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">操作日 To</label>
+                    <input type="date"
+                           name="toDate"
+                           value="@(Model.ToDate?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">
+                        検索
+                    </button>
+                </div>
+
+                <div class="col-md-12">
+                    <a asp-controller="OperationLogs" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        条件クリア
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">操作ログ一覧</h2>
+            <span class="text-muted small">@Model.Logs.Count 件</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>日時</th>
+                        <th>ユーザー</th>
+                        <th>操作種別</th>
+                        <th>対象</th>
+                        <th>対象ID</th>
+                        <th>操作内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td>@log.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                            <td>@log.UserName</td>
+                            <td>
+                                @if (log.ActionType == "Create")
+                                {
+                                    <span class="badge bg-success">@log.ActionType</span>
+                                }
+                                else if (log.ActionType == "Update")
+                                {
+                                    <span class="badge bg-primary">@log.ActionType</span>
+                                }
+                                else if (log.ActionType == "Delete")
+                                {
+                                    <span class="badge bg-danger">@log.ActionType</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@log.ActionType</span>
+                                }
+                            </td>
+                            <td>@log.TargetTable</td>
+                            <td>@(log.TargetId?.ToString() ?? "-")</td>
+                            <td>@log.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Logs.Any())
+        {
+            <div class="card-body text-center text-muted">
+                条件に一致する操作ログがありません。
+            </div>
+        }
+    </div>
+</div>

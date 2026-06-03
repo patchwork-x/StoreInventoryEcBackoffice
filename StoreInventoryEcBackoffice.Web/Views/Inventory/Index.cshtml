@@ -1,0 +1,180 @@
+﻿@model StoreInventoryEcBackoffice.Web.ViewModels.InventoryListViewModel
+
+@{
+    ViewData["Title"] = "店舗在庫管理";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 fw-bold">店舗在庫管理</h1>
+            <p class="text-muted mb-0">
+                店舗ごとの商品在庫、EC掲載可否、最終更新日時を確認できます。
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">検索条件</h2>
+        </div>
+
+        <div class="card-body">
+            <form method="get" asp-controller="Inventory" asp-action="Index" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">キーワード</label>
+                    <input type="text"
+                           name="keyword"
+                           value="@Model.Keyword"
+                           class="form-control"
+                           placeholder="商品名・商品コード・JANコード" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">店舗</label>
+                    <select name="storeId" class="form-select">
+                        <option value="">すべて</option>
+                        @foreach (var store in Model.Stores)
+                        {
+                            if (Model.StoreId == store.Id)
+                            {
+                                <option value="@store.Id" selected>@store.StoreName</option>
+                            }
+                            else
+                            {
+                                <option value="@store.Id">@store.StoreName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">EC掲載可否</label>
+                    <select name="isEcAvailable" class="form-select">
+                        <option value="">すべて</option>
+                        @if (Model.IsEcAvailable == true)
+                        {
+                            <option value="true" selected>掲載可</option>
+                        }
+                        else
+                        {
+                            <option value="true">掲載可</option>
+                        }
+
+                        @if (Model.IsEcAvailable == false)
+                        {
+                            <option value="false" selected>掲載不可</option>
+                        }
+                        else
+                        {
+                            <option value="false">掲載不可</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">在庫状態</label>
+                    <select name="stockStatus" class="form-select">
+                        <option value="">すべて</option>
+
+                        @if (Model.StockStatus == "inStock")
+                        {
+                            <option value="inStock" selected>在庫あり</option>
+                        }
+                        else
+                        {
+                            <option value="inStock">在庫あり</option>
+                        }
+
+                        @if (Model.StockStatus == "outOfStock")
+                        {
+                            <option value="outOfStock" selected>在庫なし</option>
+                        }
+                        else
+                        {
+                            <option value="outOfStock">在庫なし</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">
+                        検索
+                    </button>
+                </div>
+
+                <div class="col-md-12">
+                    <a asp-controller="Inventory" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        条件クリア
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">店舗在庫一覧</h2>
+            <span class="text-muted small">@Model.Inventories.Count 件</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>店舗</th>
+                        <th>エリア</th>
+                        <th>商品コード</th>
+                        <th>商品名</th>
+                        <th>カテゴリ</th>
+                        <th>状態</th>
+                        <th class="text-end">在庫数</th>
+                        <th>EC掲載</th>
+                        <th>最終更新</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Inventories)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@item.StoreName</div>
+                                <div class="small text-muted">@item.StoreCode</div>
+                            </td>
+                            <td>@item.Area</td>
+                            <td>@item.ProductCode</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.CategoryName</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    @item.ConditionRank
+                                </span>
+                            </td>
+                            <td class="text-end fw-semibold">
+                                @item.Quantity
+                            </td>
+                            <td>
+                                @if (item.IsEcAvailable)
+                                {
+                                    <span class="badge bg-success">掲載可</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">掲載不可</span>
+                                }
+                            </td>
+                            <td>@item.LastStockUpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Inventories.Any())
+        {
+            <div class="card-body text-center text-muted">
+                条件に一致する在庫情報がありません。
+            </div>
+        }
+    </div>
+</div>
