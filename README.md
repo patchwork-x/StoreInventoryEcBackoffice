@@ -163,7 +163,7 @@ dotnet run
 
 5. ブラウザでアクセス
 
-https://localhost:xxxx
+https://localhost:5219
 
 ## 今後の改善案
 
