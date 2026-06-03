@@ -1,9 +1,38 @@
-﻿bin/
+﻿# Build results
+bin/
 obj/
+
+# Visual Studio
 .vs/
 *.user
 *.suo
-*.cache
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
 *.log
 
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# User secrets / local settings
 appsettings.Development.json
+secrets.json
+
+# Temporary files
+*.tmp
+*.temp
